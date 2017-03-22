@@ -29,6 +29,7 @@ from .core.json_encoder import serialize_json
 from .document import Document, DEFAULT_TITLE
 from .model import Model
 from .resources import BaseResources, _SessionCoordinates
+from .settings import settings
 from .util.deprecation import deprecated
 from .util.string import encode_utf8
 from .util.serialization import make_id
@@ -581,12 +582,17 @@ def autoload_server(model, app_path=None, session_id=None, url="default", relati
     return encode_utf8(tag)
 
 def _script_for_render_items(docs_json, render_items, app_path=None, absolute_url=None):
-    return _wrap_in_onload(_wrap_in_safely(DOC_JS.render(
+    js = DOC_JS.render(
         docs_json=serialize_json(docs_json),
         render_items=serialize_json(render_items),
         app_path=app_path,
         absolute_url=absolute_url,
-    )))
+    )
+
+    if not settings.dev:
+        js = _wrap_in_safely(js)
+
+    return _wrap_in_onload(js)
 
 def _html_page_for_render_items(bundle, docs_json, render_items, title,
                                 template=FILE, template_variables={}):
