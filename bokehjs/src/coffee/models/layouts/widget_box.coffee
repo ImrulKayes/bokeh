@@ -1,11 +1,9 @@
-import {BokehView} from "core/bokeh_view"
 import {WEAK_EQ, GE, EQ, Strength, Variable} from "core/layout/solver"
 import {logger} from "core/logging"
 import * as p from "core/properties"
 import {extend} from "core/util/object"
 
 import {LayoutDOM, LayoutDOMView} from "../layouts/layout_dom"
-
 
 export class WidgetBoxView extends LayoutDOMView
   className: "bk-widget-box"
