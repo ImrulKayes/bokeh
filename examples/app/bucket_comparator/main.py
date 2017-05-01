@@ -71,37 +71,50 @@ def get_percentiles(df):
 
     return percentiles, group_A_percentiles, group_B_percentiles
 
-
 """
+""""""""""""""""""""""""""""""
 Entry of main functionalities
+""""""""""""""""""""""""""""""
 """
 
+# Read data in a pandas dataframe
 df = read_data(data_path)
+
+# Get unique sections from the pandas dataframe
 section_list = list(df.section.unique())
 
+# Select a seed section
 section = section_list[1]
 
+# Filter the dataframe based on the section
 df_selected = get_selected_df(section)
 
-
+# Get percentiles of the dataframe
 percentile, group_A_percentiles, group_B_percentiles = get_percentiles(df_selected)
+
+# ColumnDataSource to be used in Table
 percentile_source = ColumnDataSource(
     data=dict(percentile=percentile, group_A_percentiles=group_A_percentiles, group_B_percentiles=group_B_percentiles))
 
+# Columns to be used in Table
 columns = [
     TableColumn(field="percentile", title="Percentile"),
     TableColumn(field="group_A_percentiles", title="Group A"),
     TableColumn(field="group_B_percentiles", title="Group B")
 ]
 
+# Create a data table
 data_table = DataTable(source=percentile_source, columns=columns, width=400, height=280)
 
-# pre text for the data table
+# Pre text for the data table
 pre_text_text = """Percentiles of buckets for section: {0}"""
 table_pre_text = PreText(text=pre_text_text.format(section), width=400, height=20)
 
+# ColumnDataSource for the plot
 count_source = ColumnDataSource(
     data=dict(section_col=df_selected.section, bucket=df_selected.bucket, group_A=df_selected.group_A, group_B=df_selected.group_B))
+
+# Create the figure plot
 count_Plot = figure(title="Count plot", tools="",
                     toolbar_location=None, plot_height=400, plot_width=800)
 
@@ -111,8 +124,8 @@ count_Plot.yaxis.axis_label = "Total count"
 line_group_A = count_Plot.line('bucket', 'group_A', color='#A6CEE3', legend='Group A', source=count_source)
 line_group_B = count_Plot.line('bucket', 'group_B', color='#B2DF8A', legend='Group B', source=count_source)
 
+# Custom java script code will be exected to when Download data buttion will be clicked
 code = open(join(dirname(__file__), "download_data.js")).read()
-
 download_button = Button(label="Download data", button_type="success")
 download_button.callback = CustomJS(args = dict(source=count_source),
                                     code = code)
